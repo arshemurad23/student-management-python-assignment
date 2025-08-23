@@ -1,15 +1,67 @@
+# ==========================
 # Student Management System
+# ==========================
 
 students = {}   # Dictionary: key = Roll No, value = {"name": name, "marks": marks}
 
+
+# Function to safely take integer input
+def input_int(prompt):
+    while True:
+        val = input(prompt)
+        if val.isdigit():
+            return int(val)
+        else:
+            print("❌ Invalid input! Please enter a valid integer.\n")
+
+
+# Function to safely take float input (0-100 only)
+def input_float(prompt):
+    while True:
+        val = input(prompt)
+        try:
+            num = float(val)
+            if 0 <= num <= 100:
+                return num
+            else:
+                print("❌ Marks must be between 0 and 100.\n")
+        except ValueError:
+            print("❌ Invalid input! Please enter a valid number.\n")
+
+
+# Function to safely take name (string only, cleaned properly)
+def input_name(prompt):
+    while True:
+        val = input(prompt)
+
+        # agar sirf spaces diye hain
+        if val.isspace() or val == "":
+            print("❌ Invalid input! Name cannot be empty or spaces only.\n")
+            continue
+
+        val = val.strip()                 # start/end spaces remove
+        val = " ".join(val.split())       # multiple spaces -> single space
+
+        if val.replace(" ", "").isalpha():  # sirf alphabets allowed
+            return val
+        else:
+            print("❌ Invalid input! Please enter alphabets only.\n")
+
+
 # Function to add student
 def add_student():
-    roll_no = input("Enter Roll No: ")
-    name = input("Enter Name: ")
-    marks = int(input("Enter Marks: "))
-    
+    roll_no = input_int("Enter Roll No: ")
+
+    if roll_no in students:   # ✅ Duplicate check
+        print(f"\n❌ Roll No {roll_no} already exists! Please use a different Roll No.\n")
+        return   # function yahin stop ho jayega
+
+    name = input_name("Enter Name: ")
+    marks = input_float("Enter Marks (0-100): ")
+
     students[roll_no] = {"name": name, "marks": marks}
     print(f"\n✅ Student {name} added successfully!\n")
+
 
 # Function to view all students
 def view_students():
@@ -20,6 +72,7 @@ def view_students():
         for roll, data in students.items():
             print(f"Roll No: {roll}, Name: {data['name']}, Marks: {data['marks']}")
     print()
+
 
 # Function to calculate grade
 def calculate_grade(marks):
@@ -32,9 +85,10 @@ def calculate_grade(marks):
     else:
         return "Fail"
 
+
 # Function to view specific student
 def view_student():
-    roll_no = input("Enter Roll No to search: ")
+    roll_no = input_int("Enter Roll No to search: ")
     if roll_no in students:
         data = students[roll_no]
         grade = calculate_grade(data["marks"])
@@ -42,34 +96,62 @@ def view_student():
     else:
         print("\n❌ Student not found!\n")
 
+
 # Function to delete student
 def delete_student():
-    roll_no = input("Enter Roll No to delete: ")
+    roll_no = input_int("Enter Roll No to delete: ")
     if roll_no in students:
         removed = students.pop(roll_no)
         print(f"\n🗑️ Student {removed['name']} removed successfully!\n")
     else:
         print("\n❌ Student not found!\n")
 
+
 # Function to update student
 def update_student():
-    roll_no = input("Enter Roll No to update: ")
+    roll_no = input_int("Enter Roll No to update: ")
     if roll_no in students:
         print(f"\n✏️ Current Data -> Name: {students[roll_no]['name']}, Marks: {students[roll_no]['marks']}")
-        name = input("Enter New Name (leave blank to keep same): ")
-        marks_input = input("Enter New Marks (leave blank to keep same): ")
 
-        # Agar name blank hai to purana name hi rahe
-        if name.strip() != "":
-            students[roll_no]["name"] = name
+        # Name update with validation
+        while True:
+            name = input("Enter New Name (leave blank to keep same): ")
 
-        # Agar marks blank nahi hai to int mai convert karke update karein
-        if marks_input.strip() != "":
-            students[roll_no]["marks"] = int(marks_input)
+            if name.strip() == "":   # agar user ne blank chhoda to skip
+                break
+
+            if name.isspace():   # sirf spaces diye
+                print("⚠️ Invalid name! Cannot be spaces only.\n")
+                continue
+
+            name = name.strip()
+            name = " ".join(name.split())  # multiple spaces -> single space
+
+            if name.replace(" ", "").isalpha():
+                students[roll_no]["name"] = name
+                break
+            else:
+                print("⚠️ Invalid name! Please enter alphabets only.\n")
+
+        # Marks update with validation
+        while True:
+            marks_input = input("Enter New Marks (leave blank to keep same): ")
+            if marks_input.strip() == "":   # user ne blank chhoda
+                break
+            try:
+                marks_val = float(marks_input)
+                if 0 <= marks_val <= 100:
+                    students[roll_no]["marks"] = marks_val
+                    break
+                else:
+                    print("⚠️ Marks must be between 0 and 100.\n")
+            except ValueError:
+                print("⚠️ Invalid marks! Please enter a valid number.\n")
 
         print(f"\n✅ Student {students[roll_no]['name']} updated successfully!\n")
     else:
         print("\n❌ Student not found!\n")
+
 
 # Main Menu
 def menu():
@@ -99,6 +181,7 @@ def menu():
             break
         else:
             print("\n⚠️ Invalid Choice! Try again.\n")
+
 
 # Run the program
 menu()
