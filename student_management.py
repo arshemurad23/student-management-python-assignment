@@ -154,6 +154,7 @@ def update_student():
 
 
 # Main Menu
+# Main Menu
 def menu():
     while True:
         print("===== Student Management System =====")
@@ -164,7 +165,7 @@ def menu():
         print("5. Update Student")
         print("6. Exit")
 
-        choice = input("Enter choice: ")
+        choice = input("Enter choice: ").strip()   # ✅ spaces remove ho jayengi
 
         if choice == "1":
             add_student()
@@ -181,6 +182,7 @@ def menu():
             break
         else:
             print("\n⚠️ Invalid Choice! Try again.\n")
+
 
 
 # Run the program
